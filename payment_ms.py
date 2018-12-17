@@ -92,7 +92,7 @@ def pay(user_id):
     if not request.json:
         abort(400)
     
-    url = 'http://127.0.0.1:7000/creditcard/pay'
+    url = 'http://blablabox-bank.herokuapp.com/creditcard/pay'
 
     response = requests.post(url, json=request.json)
     print(response.status_code)
