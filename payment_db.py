@@ -88,6 +88,18 @@ def update_item(user_id,movie_id,price,duration):
         raise
 
 
+def get_cart_items(user_id):
+    cart_obj = carttrans.query.filter_by(user_id=user_id).filter_by(is_completed=False).first()
+    items = itemtrans.query.filter_by(trans_id=cart_obj.trans_id).all()
+    return items    
 
+def get_rented_movies(user_id):
+    carts = carttrans.query.filter_by(user_id=user_id).filter_by(is_completed=True).all()
+    rented_movies = []
+    for cart in carts:
+        movies = itemtrans.query.filter_by(trans_id=cart.trans_id).filter(itemtrans.duration!=0).all()
+        for i in movies:
+            rented_movies.append(i)
+    return rented_movies if rented_movies != [] else None   
 
 db.create_all()

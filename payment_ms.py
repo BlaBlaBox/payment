@@ -1,8 +1,9 @@
 from flask import jsonify, request, abort
 import requests
 from payment_config import app
+import json
 from datetime import datetime
-from payment_db import add_cart, complete_cart, add_item, remove_item, update_item
+from payment_db import add_cart, complete_cart, add_item, remove_item, update_item, get_cart_items, get_rented_movies
 from flask_httpauth import HTTPBasicAuth
 
 auth = HTTPBasicAuth()
@@ -42,7 +43,7 @@ def create_item(user_id):
     new_item = add_item(user_id,movie_id,price,duration)
     if new_item == None:
         return jsonify({'error': 'Item is already in the cart.'}), 400
-    return jsonify({'result': 'Success','item_id':new_item.trans_id}), 200
+    return jsonify({'result': 'Success'}), 200
 
 
 @app.route('/cart/item/delete/<int:user_id>', methods=['POST'])
@@ -69,16 +70,20 @@ def update_item(user_id):
     new_item = remove_item(user_id,movie_id)
     return jsonify({'result': 'Success','item_id':new_item.trans_id}), 200
 
-@app.route('/cart/get/<int:user_id>', methods=['POST'])
+@app.route('/cart/get/<int:user_id>', methods=['GET'])
 #@auth.login_required
 def get_cart(user_id):
-    if not request.json:
-        abort(400)
 
 
+    items = get_cart_items(user_id)
+    if items is None:
+            return jsonify({'error': 'There is no item in the cart.'}), 400 
 
-    new_item = remove_item(user_id,movie_id)
-    return jsonify({'result': 'Success','item_id':new_item.trans_id}), 200
+    item_list = []
+    for item in items:
+        item_list.append({"movie_id":str(item.movie_id),"price":str(item.price),"duration":str(item.duration)})
+
+    return jsonify({'result': 'Success','item_list':item_list}), 200
 
 
 @app.route('/payment/pay/<int:user_id>', methods=['POST'])
@@ -89,7 +94,7 @@ def pay(user_id):
     
     url = 'http://127.0.0.1:7000/creditcard/pay'
 
-    response = requests.post(url, json=request.json,headers={'Content-Type': 'application/json'})
+    response = requests.post(url, json=request.json)
     print(response.status_code)
     result = response.status_code
     
@@ -102,6 +107,16 @@ def pay(user_id):
     else:
         return response.content
 
+
+@app.route('/payment/rent/get/<int:user_id>', methods=['GET'])
+def get_rented(user_id):
+    movies = get_rented_movies(user_id)
+    movies_list = []
+    if movies == None:
+            return jsonify({'error': 'There is no movie to shown.'}), 400 
+    for movie in movies:
+        movies_list.append({"movie_id":str(movie.movie_id)})
+    return jsonify({'result': 'Success','movies_list':movies_list}), 200
 
 # Validate the admin signin
 @auth.verify_password
