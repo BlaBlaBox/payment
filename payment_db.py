@@ -62,6 +62,9 @@ def complete_cart(user_id):
 
 def add_item(user_id,movie_id,price,duration):
     cart_obj = carttrans.query.filter_by(user_id=user_id).filter_by(is_completed=False).first()
+    search_item = itemtrans.query.filter_by(movie_id=movie_id).filter_by(trans_id=cart_obj.trans_id).first()
+    if search_item:
+        return None 
     new_item = itemtrans(trans_id=cart_obj.trans_id,movie_id=movie_id,price=price,duration=duration)
     return add_db(new_item)
     

@@ -37,11 +37,11 @@ def create_item(user_id):
 
     movie_id = request.json['movie_id']
     price = request.json['price']
-    duration = requests.json['duration']
+    duration = request.json['duration']
 
     new_item = add_item(user_id,movie_id,price,duration)
     if new_item == None:
-        return jsonify({'error': 'There is a problem with creating new item.'}), 400
+        return jsonify({'error': 'Item is already in the cart.'}), 400
     return jsonify({'result': 'Success','item_id':new_item.trans_id}), 200
 
 
@@ -69,6 +69,17 @@ def update_item(user_id):
     new_item = remove_item(user_id,movie_id)
     return jsonify({'result': 'Success','item_id':new_item.trans_id}), 200
 
+@app.route('/cart/get/<int:user_id>', methods=['POST'])
+#@auth.login_required
+def get_cart(user_id):
+    if not request.json:
+        abort(400)
+
+
+
+    new_item = remove_item(user_id,movie_id)
+    return jsonify({'result': 'Success','item_id':new_item.trans_id}), 200
+
 
 @app.route('/payment/pay/<int:user_id>', methods=['POST'])
 #@auth.login_required
@@ -87,7 +98,7 @@ def pay(user_id):
         new_cart = add_cart(user_id)
         if new_cart == None:
             return jsonify({'error': 'There is already a cart which is not finished.'}), 400 
-        return jsonify({'result': 'Success','cart_id':new_cart.trans_id}), 200
+        return jsonify({'result': 'Success'}), 200
     else:
         return response.content
 
