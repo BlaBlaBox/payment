@@ -95,7 +95,7 @@ def get_rented_movies(user_id):
     carts = carttrans.query.filter_by(user_id=user_id).filter_by(is_completed=True).all()
     rented_movies = []
     for cart in carts:
-        movies = itemtrans.query.filter_by(trans_id=cart.trans_id).filter(itemtrans.duration != 0).all()
+        movies = itemtrans.query.filter_by(trans_id=cart.trans_id).all()
         for i in movies:
             rented_movies.append(i)
     return rented_movies if rented_movies != [] else None
