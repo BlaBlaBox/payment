@@ -76,7 +76,7 @@ def remove_item(user_id, movie_id):
 def update_item_db(user_id, movie_id, price, duration):
     try:
         cart_obj = carttrans.query.filter_by(user_id=user_id).filter_by(is_completed=False).first()
-        rent_obj = carttrans.query.filter_by(trans_id=cart_obj.trans_id).filter_by(movie_id=movie_id).first()
+        rent_obj = itemtrans.query.filter_by(trans_id=cart_obj.trans_id).filter_by(movie_id=movie_id).first()
         rent_obj.price = price
         rent_obj.duration = duration
         db.session.commit()

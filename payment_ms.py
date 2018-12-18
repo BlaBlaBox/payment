@@ -75,7 +75,6 @@ def update_item(user_id):
 #@auth.login_required
 def get_cart(user_id):
 
-
     items = get_cart_items(user_id)
     if items is None:
         return jsonify({'error': 'There is no item in the cart.'}), 400
