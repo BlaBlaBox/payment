@@ -42,17 +42,6 @@ def create_item(user_id):
     return jsonify({'result': 'Success'}), 200
 
 
-@app.route('/cart/item/delete/<int:user_id>', methods=['POST'])
-def delete_item(user_id):
-    if not request.json:
-        abort(400)
-
-    movie_id = request.json['movie_id']
-
-    remove_item(user_id, movie_id)
-    return jsonify({'result': 'Success'}), 200
-
-
 @app.route('/cart/item/update/<int:user_id>', methods=['POST'])
 def update_item(user_id):
     if not request.json:
