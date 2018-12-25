@@ -47,7 +47,7 @@ class TestClass(object):
         }
 
         r = requests.post(url=self.base_url+'/payment/pay/1', json=l)
-        assert r.status_code == 200 or r.status_code == 400
+        assert r.status_code == 200
 
     def test_rent(self):
         r = requests.get(url=self.base_url+'/payment/rent/get/1')
