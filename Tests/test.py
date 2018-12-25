@@ -42,7 +42,8 @@ class TestClass(object):
             'holder': 'ALPEREN KANTARCI',
             'expiration': '1219',
             'number': '5105105105105105',
-            'cvc': '510'
+            'cvc': '510',
+            'cost': '1'
         }
 
         r = requests.post(url=self.base_url+'/payment/pay/1', json=l)
