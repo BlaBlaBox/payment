@@ -1,17 +1,14 @@
 from flask import jsonify, request, abort
-from flask_httpauth import HTTPBasicAuth
 import requests
 from payment_config import app
 from payment_db import add_cart, complete_cart, add_item, remove_item, update_item_db, get_cart_items, get_rented_movies
 
 
-auth = HTTPBasicAuth()
-
 @app.errorhandler(400)
 def bad_request(error):
     return jsonify({'error': 'Your request doesn\'t contain JSON'}), 400
 
-@auth.error_handler
+@app.errorhandler(401)
 def unauthorized():
     return jsonify({'error': 'Unauthorized access'}), 403
 
@@ -23,15 +20,14 @@ def not_found(error):
 
 # The create action of payment
 @app.route('/cart/create/<int:user_id>', methods=['POST'])
-#@auth.login_required
 def create_cart(user_id):
     new_cart = add_cart(user_id)
     if new_cart is None:
         return jsonify({'error': 'There is already a cart which is not finished.'}), 400
     return jsonify({'result': 'Success', 'cart_id':new_cart.trans_id}), 200
 
+
 @app.route('/cart/item/create/<int:user_id>', methods=['POST'])
-#@auth.login_required
 def create_item(user_id):
     if not request.json:
         abort(400)
@@ -47,7 +43,6 @@ def create_item(user_id):
 
 
 @app.route('/cart/item/delete/<int:user_id>', methods=['POST'])
-#@auth.login_required
 def delete_item(user_id):
     if not request.json:
         abort(400)
@@ -57,8 +52,8 @@ def delete_item(user_id):
     remove_item(user_id, movie_id)
     return jsonify({'result': 'Success'}), 200
 
+
 @app.route('/cart/item/update/<int:user_id>', methods=['POST'])
-#@auth.login_required
 def update_item(user_id):
     if not request.json:
         abort(400)
@@ -72,7 +67,6 @@ def update_item(user_id):
 
 
 @app.route('/cart/get/<int:user_id>', methods=['GET'])
-#@auth.login_required
 def get_cart(user_id):
 
     items = get_cart_items(user_id)
@@ -87,7 +81,6 @@ def get_cart(user_id):
 
 
 @app.route('/payment/pay/<int:user_id>', methods=['POST'])
-#@auth.login_required
 def pay(user_id):
     if not request.json:
         abort(400)
@@ -118,11 +111,6 @@ def get_rented(user_id):
         movies_list.append({"movie_id":str(movie.movie_id)})
     return jsonify({'result': 'Success', 'movies_list':movies_list}), 200
 
-# Validate the admin signin
-@auth.verify_password
-def verify_password(username, password):
-    # TODO: Change check if is admin in the database or not.
-    return username == 'admin' and password == 'asdqwe123'
 
 
 if __name__ == '__main__':
