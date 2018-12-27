@@ -86,8 +86,9 @@ def pay(user_id):
         if new_cart is None:
             return jsonify({'error': 'There is already a cart which is not finished.'}), 400
         return jsonify({'result': 'Success'}), 200
+    else:
+        return jsonify({'error': 'There is problem with the bank service.'}), 402
 
-    return response.content
 
 
 @app.route('/payment/rent/get/<int:user_id>', methods=['GET'])
