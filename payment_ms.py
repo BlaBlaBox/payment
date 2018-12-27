@@ -1,21 +1,27 @@
-from flask import jsonify, request, abort
-import requests
-from payment_config import app
-from payment_db import add_cart, complete_cart, add_item, remove_item, update_item_db, get_cart_items, get_rented_movies
+from flask import jsonify, request, abort  # pragma: no cover
+import requests  # pragma: no cover
+from payment_config import app  # pragma: no cover
+from payment_db import add_cart, complete_cart, add_item, remove_item, update_item_db, get_cart_items, get_rented_movies  # pragma: no cover
+from coverage import Coverage, CoverageException  # pragma: no cover
 
 
-@app.errorhandler(400)
+@app.errorhandler(400)  # pragma: no cover
 def bad_request(error):
     return jsonify({'error': 'Your request doesn\'t contain JSON'}), 400
 
-@app.errorhandler(401)
+
+@app.errorhandler(401)  # pragma: no cover
 def unauthorized():
     return jsonify({'error': 'Unauthorized access'}), 403
 
-@app.errorhandler(404)
+
+@app.errorhandler(404)  # pragma: no cover
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
 
+
+cov = Coverage()  # pragma: no cover
+cov.start()  # pragma: no cover
 
 
 # The create action of payment
@@ -24,13 +30,13 @@ def create_cart(user_id):
     new_cart = add_cart(user_id)
     if new_cart is None:
         return jsonify({'error': 'There is already a cart which is not finished.'}), 400
-    return jsonify({'result': 'Success', 'cart_id':new_cart.trans_id}), 200
+    return jsonify({'result': 'Success', 'cart_id': new_cart.trans_id}), 200
 
 
 @app.route('/cart/item/create/<int:user_id>', methods=['POST'])
 def create_item(user_id):
     if not request.json:
-        abort(400)
+        abort(400)  # pragma: no cover
 
     movie_id = request.json['movie_id']
     price = request.json['price']
@@ -45,7 +51,7 @@ def create_item(user_id):
 @app.route('/cart/item/update/<int:user_id>', methods=['POST'])
 def update_item(user_id):
     if not request.json:
-        abort(400)
+        abort(400)  # pragma: no cover
 
     movie_id = request.json['movie_id']
     price = request.json['price']
@@ -64,15 +70,15 @@ def get_cart(user_id):
 
     item_list = []
     for item in items:
-        item_list.append({"movie_id":str(item.movie_id), "price":str(item.price), "duration":str(item.duration)})
+        item_list.append({"movie_id": str(item.movie_id), "price": str(item.price), "duration": str(item.duration)})
 
-    return jsonify({'result': 'Success', 'item_list':item_list}), 200
+    return jsonify({'result': 'Success', 'item_list': item_list}), 200
 
 
 @app.route('/payment/pay/<int:user_id>', methods=['POST'])
 def pay(user_id):
     if not request.json:
-        abort(400)
+        abort(400)  # pragma: no cover
 
     URL = 'http://blablabox-bank.herokuapp.com/creditcard/pay'
 
@@ -86,8 +92,8 @@ def pay(user_id):
         if new_cart is None:
             return jsonify({'error': 'There is already a cart which is not finished.'}), 400
         return jsonify({'result': 'Success'}), 200
-
-    return response.content
+    else:
+        return jsonify({'error': 'There is problem with the bank service.'}), 402
 
 
 @app.route('/payment/rent/get/<int:user_id>', methods=['GET'])
@@ -97,9 +103,20 @@ def get_rented(user_id):
     if movies is None:
         return jsonify({'error': 'There is no movie to shown.'}), 400
     for movie in movies:
-        movies_list.append({"movie_id":str(movie.movie_id)})
-    return jsonify({'result': 'Success', 'movies_list':movies_list}), 200
+        movies_list.append({"movie_id": str(movie.movie_id)})
+    return jsonify({'result': 'Success', 'movies_list': movies_list}), 200
 
+
+@app.route('/endtest')  # pragma: no cover
+def end_test():
+    cov.stop()
+    cov.save()
+    try:
+        cov.html_report()
+        return jsonify({'result': 'Coverage report has been saved'}), 200
+    except CoverageException as err:
+        print("Error ", err)
+        return jsonify({'result': 'Error on coverage'}), 400
 
 
 if __name__ == '__main__':
