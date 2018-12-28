@@ -68,10 +68,10 @@ def test_payment_actions():
     # Valid and invalid user
     valid_user, invalid_user = str(1), str(100000000000)
 
-    # Create card with user that has a cart
+    # Create cart with user that has a cart
     pAction.create_cart(valid_user, 400)
 
-    # Create card with user that is not valid
+    # Create cart with user that is not valid
     pAction.create_cart(invalid_user, 500)
 
     # Create item for valid user might have already or not
