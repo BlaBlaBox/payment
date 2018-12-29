@@ -1,8 +1,8 @@
-from flask import jsonify, request, abort  # pragma: no cover
-import requests  # pragma: no cover
-from payment_config import app  # pragma: no cover
+from flask import jsonify, request, abort           # pragma: no cover
+import requests                                     # pragma: no cover
+from payment_config import app                      # pragma: no cover
 from payment_db import add_cart, complete_cart, add_item, remove_item, update_item_db, get_cart_items, get_rented_movies  # pragma: no cover
-from coverage import Coverage, CoverageException  # pragma: no cover
+from coverage import Coverage, CoverageException    # pragma: no cover
 
 
 @app.errorhandler(400)  # pragma: no cover
@@ -20,8 +20,8 @@ def not_found(error):
     return jsonify({'error': 'Not found'}), 404
 
 
-cov = Coverage()  # pragma: no cover
-cov.start()  # pragma: no cover
+cov = Coverage()            # pragma: no cover
+cov.start()                 # pragma: no cover
 
 
 # The create action of payment
@@ -78,7 +78,7 @@ def get_cart(user_id):
 @app.route('/payment/pay/<int:user_id>', methods=['POST'])
 def pay(user_id):
     if not request.json:
-        abort(400)  # pragma: no cover
+        abort(400)      # pragma: no cover
 
     URL = 'http://blablabox-bank.herokuapp.com/creditcard/pay'
 
@@ -119,5 +119,5 @@ def end_test():
         return jsonify({'result': 'Error on coverage'}), 400
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':      # pragma: no cover
     app.run(debug=True, port=8000)

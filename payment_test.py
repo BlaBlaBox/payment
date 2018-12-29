@@ -1,17 +1,16 @@
 import string
 import random
 import requests
-import pytest
 
 from random import randint
-# Usage: pytest -q test.py
+# Usage: pytest payment_test.py
 
 
 class PaymentAction():
-    base_url = 'https://blablabox-transaction.herokuapp.com'
+    # base_url = 'https://blablabox-transaction.herokuapp.com'
 
     # For local testing
-    # base_url = 'http://127.0.0.1:8000'
+    base_url = 'http://127.0.0.1:8000'
 
     def create_cart(self, user_id, required_status):
         r = requests.post(url=self.base_url + '/cart/create/' + user_id)
